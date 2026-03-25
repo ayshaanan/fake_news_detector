@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fake News Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Fake News Detector</h1>
+
+    <form method="POST">
+        <textarea name="news" placeholder="Enter news here...">{{ news_text }}</textarea>
+
+        <select name="model">
+            <option value="nb" {% if selected_model == "nb" %}selected{% endif %}>
+                Naive Bayes
+            </option>
+            <option value="pa" {% if selected_model == "pa" %}selected{% endif %}>
+                Passive Aggressive
+            </option>
+        </select>
+
+        <button type="submit">Analyze News</button>
+    </form>
+
+    {% if prediction is not none %}
+    <div class="result">
+        {% if prediction == 1 or prediction == "REAL" or prediction == "Real" %}
+            <h2 style="color: green;">REAL News ✅</h2>
+        {% else %}
+            <h2 style="color: red;">FAKE News ❌</h2>
+        {% endif %}
+
+        <p><strong>Confidence Score:</strong> {{ confidence }}%</p>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

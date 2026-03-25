@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Fake News Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="#" id="live-news-btn">Live News</a></li>
+            <li><a href="#" id="sudoku-btn">Sudoku</a></li>
+        </ul>
+    </nav>
+
+    <div id="live-news-section" style="display: none;">
+        <div class="news-ticker-container">
+            <div class="news-ticker">
+                <a href="https://www.bbc.com/news" target="_blank" class="news-tab">BBC</a>
+                <a href="https://timesofindia.indiatimes.com/" target="_blank" class="news-tab">Times of India</a>
+                <a href="https://edition.cnn.com/" target="_blank" class="news-tab">CNN International</a>
+                <a href="https://zeenews.india.com/" target="_blank" class="news-tab">Zee Media</a>
+                <a href="https://newsable.asianetnews.com/" target="_blank" class="news-tab">Asianet News</a>
+                <a href="https://www.onmanorama.com/" target="_blank" class="news-tab">Manorama</a>
+                <a href="https://www.24newshd.tv/" target="_blank" class="news-tab">24 x 7 Updates</a>
+            </div>
+        </div>
+
+        <div class="container articles-container" style="margin-top: 20px;">
+            <h2 class="articles-header">Top Stories</h2>
+            <div class="articles-grid-horizontal">
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=400&auto=format&fit=crop" alt="News Image 1">
+                    <h3><a href="https://timesofindia.indiatimes.com/" target="_blank">Times of India: Global Markets Rally</a></h3>
+                    <p>Comprehensive coverage of today's financial trends and economic impacts worldwide.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=400&auto=format&fit=crop" alt="News Image 2">
+                    <h3><a href="https://www.bbc.com/news" target="_blank">BBC: Breakthroughs in Renewable Energy</a></h3>
+                    <p>New technologies are paving the way for a more sustainable future and cleaner environment.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=400&auto=format&fit=crop" alt="News Image 3">
+                    <h3><a href="https://edition.cnn.com/" target="_blank">CNN: Tech Giants Announce New Innovations</a></h3>
+                    <p>In-depth analysis of the latest technological products announced today.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1557992260-ec58e38d363c?q=80&w=400&auto=format&fit=crop" alt="Zee Media">
+                    <h3><a href="https://zeenews.india.com/" target="_blank">Zee Media: National Politics Update</a></h3>
+                    <p>Key developments in parliament sessions and upcoming regional elections in major states.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1534008897995-27a23e859048?q=80&w=400&auto=format&fit=crop" alt="Asianet News">
+                    <h3><a href="https://newsable.asianetnews.com/" target="_blank">Asianet News: Cultural Festival Highlights</a></h3>
+                    <p>Exclusive coverage of the grand cultural events, history, and local festivities this week.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?q=80&w=400&auto=format&fit=crop" alt="Manorama">
+                    <h3><a href="https://www.onmanorama.com/" target="_blank">Manorama: Sports Updates & Analysis</a></h3>
+                    <p>Comprehensive coverage of ongoing cricket series, football highlights, and tournament tracking.</p>
+                </div>
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1503694978374-8a2fa686963a?q=80&w=400&auto=format&fit=crop" alt="24 x 7 Updates">
+                    <h3><a href="https://www.24newshd.tv/" target="_blank">24x7 Updates: Breaking News Live</a></h3>
+                    <p>Stay tuned for real-time constant updates on breaking news unfolding around the world.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container newspaper-layout">
+        <div class="headline">
+            <div class="dateline">THE DAILY DETECTOR ‧ <span>Est. 2026</span></div>
+            <h1>Fake News Detector</h1>
+            <hr class="headline-divider">
+        </div>
+
+        <form method="POST">
+            <textarea name="news" placeholder="Enter news here...">{{ news_text }}</textarea>
+
+            <select name="model">
+                <option value="nb" {% if selected_model=="nb" %}selected{% endif %}>
+                    Naive Bayes
+                </option>
+                <option value="pa" {% if selected_model=="pa" %}selected{% endif %}>
+                    Passive Aggressive
+                </option>
+            </select>
+
+            <button type="submit">Analyze News</button>
+        </form>
+
+        {% if prediction is not none %}
+        <div class="result">
+            {% if prediction == 1 or prediction == "REAL" or prediction == "Real" %}
+            <h2 style="color: green;">REAL News ✅</h2>
+            {% else %}
+            <h2 style="color: red;">FAKE News ❌</h2>
+            {% endif %}
+
+            <p><strong>Confidence Score:</strong> {{ confidence }}%</p>
+
+            <div class="animation-container">
+                {% if selected_model == "nb" %}
+                    {% if prediction == 1 or prediction == "REAL" or prediction == "Real" %}
+                    <img src="{{ url_for('static', filename='images/happy_cat.png') }}" class="animal-anim happy-anim" style="animation-duration: {{ (150 / confidence)|round(2) }}s;" alt="Happy Cat">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/sad_cat.png') }}" class="animal-anim sad-anim" style="animation-duration: {{ (150 / confidence)|round(2) }}s;" alt="Sad Cat">
+                    {% endif %}
+                {% else %}
+                    {% if prediction == 1 or prediction == "REAL" or prediction == "Real" %}
+                    <img src="{{ url_for('static', filename='images/happy_dog.png') }}" class="animal-anim happy-anim" style="animation-duration: {{ (150 / confidence)|round(2) }}s;" alt="Happy Dog">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/sad_dog.png') }}" class="animal-anim sad-anim" style="animation-duration: {{ (150 / confidence)|round(2) }}s;" alt="Sad Dog">
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Sudoku Modal -->
+    <div id="sudoku-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 class="modal-title">Sudoku Challenge</h2>
+            <div id="sudoku-board" class="sudoku-board"></div>
+            <div class="modal-actions">
+                <button id="sudoku-check-btn" class="sudoku-btn">Check Solution</button>
+                <button id="sudoku-close-btn" class="sudoku-btn close-btn">Close</button>
+            </div>
+            <div id="sudoku-message" class="sudoku-message"></div>
+        </div>
+    </div>
+
+    <script>
+        const puzzle = [
+            [5, 3, null, null, 7, null, null, null, null],
+            [6, null, null, 1, 9, 5, null, null, null],
+            [null, 9, 8, null, null, null, null, 6, null],
+            [8, null, null, null, 6, null, null, null, 3],
+            [4, null, null, 8, null, 3, null, null, 1],
+            [7, null, null, null, 2, null, null, null, 6],
+            [null, 6, null, null, null, null, 2, 8, null],
+            [null, null, null, 4, 1, 9, null, null, 5],
+            [null, null, null, null, 8, null, null, 7, 9]
+        ];
+
+        function initSudoku() {
+            const board = document.getElementById('sudoku-board');
+            board.innerHTML = '';
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.className = 'sudoku-cell';
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    
+                    if (c % 3 === 2 && c !== 8) input.style.borderRight = '3px solid #222';
+                    if (r % 3 === 2 && r !== 8) input.style.borderBottom = '3px solid #222';
+
+                    if (puzzle[r][c] !== null) {
+                        input.value = puzzle[r][c];
+                        input.readOnly = true;
+                        input.classList.add('readonly');
+                    } else {
+                        input.addEventListener('input', function(e) {
+                            if (!/^[1-9]$/.test(this.value)) {
+                                this.value = '';
+                            }
+                            document.getElementById('sudoku-message').textContent = '';
+                        });
+                    }
+                    board.appendChild(input);
+                }
+            }
+        }
+
+        function checkSudoku() {
+            const inputs = document.querySelectorAll('.sudoku-cell');
+            let grid = Array(9).fill().map(() => Array(9).fill(0));
+            
+            for(let i=0; i<81; i++) {
+                let val = inputs[i].value;
+                if (!val) {
+                    showMessage("Please fill all empty cells!", "red");
+                    return;
+                }
+                let r = inputs[i].dataset.row;
+                let c = inputs[i].dataset.col;
+                grid[r][c] = parseInt(val);
+            }
+            
+            for (let i = 0; i < 9; i++) {
+                let rowSet = new Set(), colSet = new Set(), boxSet = new Set();
+                for (let j = 0; j < 9; j++) {
+                    let rowVal = grid[i][j];
+                    let colVal = grid[j][i];
+                    
+                    let boxRow = 3 * Math.floor(i / 3) + Math.floor(j / 3);
+                    let boxCol = 3 * (i % 3) + (j % 3);
+                    let boxVal = grid[boxRow][boxCol];
+
+                    if (rowSet.has(rowVal) || colSet.has(colVal) || boxSet.has(boxVal)) {
+                        showMessage("Solution is incorrect. Keep trying!", "red");
+                        return;
+                    }
+                    rowSet.add(rowVal);
+                    colSet.add(colVal);
+                    boxSet.add(boxVal);
+                }
+            }
+            showMessage("Congratulations! You solved it!", "green");
+        }
+
+        function showMessage(msg, color) {
+            const el = document.getElementById('sudoku-message');
+            el.textContent = msg;
+            el.style.color = color;
+        }
+
+        document.getElementById('sudoku-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('sudoku-modal').style.display = 'flex';
+            initSudoku();
+        });
+
+        document.getElementById('sudoku-close-btn').addEventListener('click', function(e) {
+            document.getElementById('sudoku-modal').style.display = 'none';
+        });
+
+        document.getElementById('sudoku-check-btn').addEventListener('click', checkSudoku);
+
+        document.getElementById('live-news-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            var liveSection = document.getElementById('live-news-section');
+            var mainContainer = document.querySelector('.container.newspaper-layout');
+            if (liveSection.style.display === 'none' || liveSection.style.display === '') {
+                liveSection.style.display = 'block';
+                if (mainContainer) mainContainer.style.display = 'none';
+            } else {
+                liveSection.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
